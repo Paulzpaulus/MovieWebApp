@@ -1,0 +1,84 @@
+/* Reset für Browser-Defaults */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Body-Styles */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+    /* hellgrauer Hintergrund */
+    color: #333;
+    /* Textfarbe */
+    line-height: 1.6;
+    padding: 20px;
+}
+
+/* Container für alles */
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    /* zentriert die Seite */
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Überschriften */
+h1,
+h2,
+h3 {
+    margin-bottom: 20px;
+    color: #222;
+}
+
+/* Formulare */
+form {
+    margin-bottom: 20px;
+}
+
+input[type="text"],
+input[type="submit"],
+button {
+    padding: 10px;
+    margin: 5px 0;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+input[type="submit"],
+button {
+    background-color: #007BFF;
+    /* Blau */
+    color: white;
+    cursor: pointer;
+    border: none;
+}
+
+input[type="submit"]:hover,
+button:hover {
+    background-color: #0056b3;
+}
+
+/* Listen / Tabellen */
+ul {
+    list-style: none;
+}
+
+li {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+/* Links */
+a {
+    color: #007BFF;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}

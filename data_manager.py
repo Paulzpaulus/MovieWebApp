@@ -3,6 +3,7 @@ from models import db, Movie, User
 class DataManager():
     """ handles CRUD operations for USER and MOVIE models"""
 
+    # USER
     def create_user(self, name: str):
         """ creates user and safes it to database"""
         user = User(name=name)
@@ -14,13 +15,28 @@ class DataManager():
             print(f"Error:{e}")
             db.session.rollback()
 
-    def get_user(self):
+    def get_user(self, user_id):
+        """
+        returns user by ID
+        """
+        try:
+            return User.query.get(user_id)
+        except Exception as e:
+            print(f"Error getting User:{e}")
+            db.session.rollback()
+            return None
+
+    def get_all_users(self):
+        """returns all users, if no users or Error return empty list"""
         try:
             users = User.query.all()
             return users
         except Exception as e:
             print(f" Error: {e}")
+            db.session.rollback()
             return []
+
+
     def delete_user(self, user_id: int):
         """
         deletes a user from db
@@ -35,6 +51,9 @@ class DataManager():
         except Exception as e:
             db.session.rollback()
             return False
+
+
+    # Movies
 
     def create_movie(self, title: str,publication_year: int, director: str, rating: float | None, user_id: int):
         """
@@ -63,31 +82,50 @@ class DataManager():
 
 
 
-    def get_user_movies(self, user_id: int):
-        """
-        Returns a list of movies for the given user_id.
-        """
-        movies = Movie.query.filter_by(user_id=user_id).all()
-        if not movies:
-            return []
-        return movies
-
-    def update_movie(self, movie_id: int, new_rating: float):
-        """
-        will allow to change the personal rating for a movie
-        """
-        movie = Movie.query.get(movie_id)
-        if not movie:
-            return None
-
-        movie.rating = new_rating
+    def get_user_movies(self, user_id: int) -> list[Movie]:
+        """Returns a list of movies for the given user_id."""
         try:
-            db.session.commit()
-            return movie
+            return Movie.query.filter_by(user_id=user_id).all()
         except Exception as e:
+            print(f"Error fetching movies: {e}")
             db.session.rollback()
-            print(f"Error: {e}")
+            return []
+
+
+    def get_movie(self, movie_id):
+        try:
+            return Movie.query.get(movie_id)
+        except Exception as e:
+            print(f"Error while fetching movie: {e}")
             return None
+
+
+def update_movie(self, movie_id: int, new_title: str | None = None, new_rating: float | None = None):
+    """
+    Updates the movie's title and/or rating.
+    Rating must be between 1 and 10 if provided.
+    """
+    movie = Movie.query.get(movie_id)
+    if not movie:
+        return None  # Movie existiert nicht
+
+    # Titel aktualisieren, falls angegeben
+    if new_title:
+        movie.title = new_title
+
+    # Rating aktualisieren, falls angegeben
+    if new_rating is not None:
+        if not (1 <= new_rating <= 10):
+            raise ValueError("Rating must be between 1 and 10")
+        movie.rating = new_rating
+
+    try:
+        db.session.commit()
+        return movie
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error updating movie: {e}")
+        return None
 
 
     def delete_movie(self, movie_id: int):
