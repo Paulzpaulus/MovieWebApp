@@ -6,27 +6,27 @@ from models import db, User
 import requests
 
 load_dotenv()
-OMDB_API_KEY = os.getenv("OMDB_API_KEY")  # Holt den Key aus der Umgebung
+OMDB_API_KEY = os.getenv("OMDB_API_KEY")  # Holt  Key
 OMDB_BASE_URL = "http://www.omdbapi.com/"
 
-# --- Flask App ---
+#  Flask App
 app = Flask(__name__)
 
-# --- Basisverzeichnis + DB ---
+#  Basisverzeichnis + DB
 basedir = os.path.abspath(os.path.dirname(__file__))
 db_dir = os.path.join(basedir, "data")
 os.makedirs(db_dir, exist_ok=True)
 db_path = os.path.join(db_dir, "movies.db")
 
-# --- Config muss vor db.init_app ---
-app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{db_path}"
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+#  Config muss vor db.init_app
+app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_path}"
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 
 db.init_app(app)
 data_manager = DataManager()
 
-#Tabellen erstellen wieso so ?
+# Tabellen erstellen wieso so ?
 with app.app_context():
     db.create_all()
 
@@ -35,6 +35,7 @@ with app.app_context():
 def pageNotFound(error):
     return "page not found", 404
 
+
 @app.errorhandler(500)
 def Error(error):
     return "Server Error", 500
@@ -42,25 +43,23 @@ def Error(error):
 
 # home zeigt alle User + Button zum hinzufügen
 
-@app.route('/', methods=['GET', 'POST'])
+
+@app.route("/", methods=["GET", "POST"])
 def home():
     print(data_manager.get_all_users())  # Debug: sollte eine Liste ausgeben
-    if request.method == 'POST':
-        name = request.form.get('name')
+    if request.method == "POST":
+        name = request.form.get("name")
         if name:
             user = User(name=name)
             db.session.add(user)
             db.session.commit()
-        return redirect(url_for('home'))  #
+        return redirect(url_for("home"))  #
 
     users = User.query.all()
-    return render_template('index.html', users=users)
+    return render_template("index.html", users=users)
 
 
-
-
-
-@app.route('/users/<int:user_id>/movies', methods=['GET', 'POST'])
+@app.route("/users/<int:user_id>/movies", methods=["GET", "POST"])
 def user_movies(user_id):
     if request.method == "POST":
         title = request.form.get("title")
@@ -69,7 +68,7 @@ def user_movies(user_id):
         if not title:
             return redirect(url_for("user_movies", user_id=user_id))
 
-         # OMDb API
+        # OMDb API
         params = {"t": title, "apikey": OMDB_API_KEY}
         if year_input and year_input.isdigit():
             params["y"] = year_input
@@ -80,20 +79,33 @@ def user_movies(user_id):
         if data.get("Response") == "False":
             return f"Movie not found: {data.get('Error')}", 404
 
-        year = int(data.get("Year")) if data.get("Year") and data.get("Year").isdigit() else None
+        year = (
+            int(data.get("Year"))
+            if data.get("Year") and data.get("Year").isdigit()
+            else None
+        )
         director = data.get("Director", "")
-        rating = float(data.get("imdbRating")) if data.get("imdbRating") and data.get("imdbRating") != "N/A" else None
+        rating = (
+            float(data.get("imdbRating"))
+            if data.get("imdbRating") and data.get("imdbRating") != "N/A"
+            else None
+        )
+
+        poster = data.get("Poster")
+        if poster in [None, "N/A"]:
+            poster = None
+
 
         data_manager.create_movie(
             title=data.get("Title", title),
             publication_year=year,
             director=director,
             rating=rating,
-            user_id=user_id
+            user_id=user_id,
+            poster=poster
         )
 
         return redirect(url_for("user_movies", user_id=user_id))
-
 
     # GET: Liste der Filme anzeigen
     user = data_manager.get_user(user_id)
@@ -113,7 +125,9 @@ def update_movie(user_id, movie_id):
         new_rating = float(rating)
 
     try:
-        data_manager.update_movie(movie_id=movie_id, new_title=title, new_rating=new_rating)
+        data_manager.update_movie(
+            movie_id=movie_id, new_title=title, new_rating=new_rating
+        )
     except ValueError as ve:
         return str(ve), 400  # z.B. "Rating must be between 1 and 10"
     except Exception as e:
@@ -122,15 +136,15 @@ def update_movie(user_id, movie_id):
     return redirect(url_for("user_movies", user_id=user_id))
 
 
-@app.route('/users/<int:user_id>/movies/<int:movie_id>/delete', methods=['POST'])
+@app.route("/users/<int:user_id>/movies/<int:movie_id>/delete", methods=["POST"])
 def delete_title(user_id, movie_id):
     movie_to_delete = data_manager.delete_movie(movie_id)
     if not movie_to_delete:
         return "Movie not found or Error deleting", 404
-    return redirect(url_for("user_movies", user_id = user_id))
+    return redirect(url_for("user_movies", user_id=user_id))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     with app.app_context():
         db.create_all()
     app.run()

@@ -17,7 +17,7 @@ class DataManager():
 
     def get_user(self, user_id):
         """
-        returns user by ID
+         returns user by ID
         """
         try:
             return User.query.get(user_id)
@@ -37,25 +37,25 @@ class DataManager():
             return []
 
 
-    def delete_user(self, user_id: int):
-        """
-        deletes a user from db
-        """
-        user = User.query.get(user_id)
-        if not user:
-            return False
-        try:
-            db.session.delete(user)
-            db.session.commit()
-            return True
-        except Exception as e:
-            db.session.rollback()
-            return False
+    # def delete_user(self, user_id: int):
+    #     """
+    #     deletes a user from db
+    #     """
+    #     user = User.query.get(user_id)
+    #     if not user:
+    #         return False
+    #     try:
+    #         db.session.delete(user)
+    #         db.session.commit()
+    #         return True
+    #     except Exception as e:
+    #         db.session.rollback()
+    #         return False
 
 
     # Movies
 
-    def create_movie(self, title: str,publication_year: int, director: str, rating: float | None, user_id: int):
+    def create_movie(self, title: str,publication_year: int, director: str, rating: float |None, user_id: int, poster: str |None):
         """
         creates and persists a movie
         """
@@ -65,12 +65,13 @@ class DataManager():
             raise TypeError("publictaion year must be an integer.")
 
         movie = Movie(
-        title=title,
-        publication_year=publication_year,
-        director=director,
-        rating=rating,
-        user_id=user_id
-    )
+                title=title,
+                publication_year=publication_year,
+                director=director,
+                rating=rating,
+                user_id=user_id,
+                poster=poster
+        )
         try:
             db.session.add(movie)
             db.session.commit()
@@ -100,32 +101,29 @@ class DataManager():
             return None
 
 
-def update_movie(self, movie_id: int, new_title: str | None = None, new_rating: float | None = None):
-    """
-    Updates the movie's title and/or rating.
-    Rating must be between 1 and 10 if provided.
-    """
-    movie = Movie.query.get(movie_id)
-    if not movie:
-        return None  # Movie existiert nicht
+    def update_movie(self, movie_id: int, new_title: str | None = None, new_rating: float | None = None):
+        """
+        Updates the movie's title and/or rating.
+        Rating must be between 1 and 10 if provided.
+        """
+        movie = Movie.query.get(movie_id)
+        if not movie:
+            return None  # Movie existiert nicht
 
-    # Titel aktualisieren, falls angegeben
-    if new_title:
-        movie.title = new_title
+        if new_title:movie.title = new_title
 
-    # Rating aktualisieren, falls angegeben
-    if new_rating is not None:
-        if not (1 <= new_rating <= 10):
-            raise ValueError("Rating must be between 1 and 10")
-        movie.rating = new_rating
+        if new_rating is not None:
+            if not (1 <= new_rating <= 10):
+                raise ValueError("Rating must be between 1 and 10")
+            movie.rating = new_rating
 
-    try:
-        db.session.commit()
-        return movie
-    except Exception as e:
-        db.session.rollback()
-        print(f"Error updating movie: {e}")
-        return None
+        try:
+            db.session.commit()
+            return movie
+        except Exception as e:
+            db.session.rollback()
+            print(f"Error updating movie: {e}")
+            return None
 
 
     def delete_movie(self, movie_id: int):

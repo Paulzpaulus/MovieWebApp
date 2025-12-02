@@ -1,16 +1,17 @@
 {% extends "base.html" %}
 
 {% block content %}
+<a href="{{ url_for('home') }}" class="back-button">← Back</a>
+
 <h1>Movies of {{ user.name }}</h1>
+
 {% if message %}
-<p style="color:red;">{{ message }}</p>
+<p class="message">{{ message }}</p>
 {% endif %}
 
-<!-- Grid für Filme -->
-<div class="movies-grid">
+<div class="movie-grid">
     {% for movie in movies %}
     <div class="movie-card">
-        <!-- Poster über OMDb API einfügen, falls verfügbar -->
         {% if movie.poster %}
         <img src="{{ movie.poster }}" alt="{{ movie.title }} Poster" class="movie-poster">
         {% else %}
@@ -21,14 +22,14 @@
         <p>Year: {{ movie.publication_year }}</p>
         <p>Rating: {{ movie.rating or "N/A" }}</p>
 
-        <!-- Update Formular -->
+        <!-- Update -->
         <form action="{{ url_for('update_movie', user_id=user.id, movie_id=movie.m_id) }}" method="POST">
             <input type="text" name="title" placeholder="New title">
-            <input type="text" name="rating" placeholder="New rating">
+            <input type="text" name="rating" placeholder="New rating (1-10)" min="1" max="10" required>
             <button type="submit">Update</button>
         </form>
 
-        <!-- Delete Formular -->
+        <!-- Delete -->
         <form action="{{ url_for('delete_title', user_id=user.id, movie_id=movie.m_id) }}" method="POST">
             <button type="submit">Delete</button>
         </form>
@@ -38,12 +39,10 @@
     {% endfor %}
 </div>
 
-<!-- Formular zum Hinzufügen neuer Filme -->
 <h2>Add Movie</h2>
 <form action="{{ url_for('user_movies', user_id=user.id) }}" method="POST">
     <input type="text" name="title" placeholder="Movie Title" required>
     <input type="text" name="year" placeholder="Year (optional)">
     <button type="submit">Add Movie</button>
 </form>
-
 {% endblock %}

@@ -4,49 +4,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>My MovieWeb App</title>
-    <i class="fa-solid fa-film"></i>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 
 <body>
-    <header>
-        <h1>My MovieWeb App</h1>
-    </header>
+    <div class="page-wrap">
 
-    <!-- MAIN CONTENT -->
-    <main class="container">
-        {% block content %}
-        <!--
-        Platzhalter für den spezifischen Inhalt der Seite.
-        Jede Child-Template kann hier eigenen Inhalt einfügen.
-        -->
-        {% endblock %}
-    </main>
-    <section class="extra-form">
-        {% block extra_form %}
-        {% endblock %}
-    </section>
+        <!-- HEADER -->
+        <header class="site-header">
+            <a href="{{ url_for('home') }}" class="logo-link">
+                <img src="{{ url_for('static', filename='logo.svg') }}" alt="Site Logo" class="site-logo">
+            </a>
+            <h1 class="site-title">My MovieWeb App</h1>
+        </header>
 
+        <!-- MAIN -->
+        <main class="container">
+            {% block content %}{% endblock %}
+        </main>
 
+        <!-- FOOTER -->
+        <footer class="site-footer">
+            <p>&copy; 2025 All rights reserved.</p>
+        </footer>
 
-
-
-
-
-
-
-
-
-
-
-
-    <!-- FOOTER -->
-    <footer>
-        <p>&copy; 2025 Paulzpaulus</p>
-    </footer>
-
+    </div>
 </body>
 
 </html>
