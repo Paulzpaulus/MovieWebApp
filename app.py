@@ -125,9 +125,7 @@ def update_movie(user_id, movie_id):
         new_rating = float(rating)
 
     try:
-        data_manager.update_movie(
-            movie_id=movie_id, new_title=title, new_rating=new_rating
-        )
+        data_manager.update_movie(movie_id=movie_id, new_title=title, new_rating=new_rating)
     except ValueError as ve:
         return str(ve), 400  # z.B. "Rating must be between 1 and 10"
     except Exception as e:

@@ -11,7 +11,7 @@
     {% for user in users %}
     <li>
         {{ user.name }}
-        <a href="{{ url_for('user_movies', user_id=user.id) }}">Movies</a>
+        <a href="{{ url_for('user_movies', user_id=user.id) }}">View Movies</a>
     </li>
     {% else %}
     <li>No users found</li>
