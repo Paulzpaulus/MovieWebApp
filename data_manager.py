@@ -1,11 +1,12 @@
 from models import db, Movie, User
 
-class DataManager():
-    """ handles CRUD operations for USER and MOVIE models"""
+
+class DataManager:
+    """handles CRUD operations for USER and MOVIE models"""
 
     # USER
     def create_user(self, name: str):
-        """ creates user and safes it to database"""
+        """creates user and safes it to database"""
         user = User(name=name)
         try:
             db.session.add(user)
@@ -17,7 +18,7 @@ class DataManager():
 
     def get_user(self, user_id):
         """
-         returns user by ID
+        returns user by ID
         """
         try:
             return User.query.get(user_id)
@@ -36,7 +37,6 @@ class DataManager():
             db.session.rollback()
             return []
 
-
     # def delete_user(self, user_id: int):
     #     """
     #     deletes a user from db
@@ -52,10 +52,17 @@ class DataManager():
     #         db.session.rollback()
     #         return False
 
-
     # Movies
 
-    def create_movie(self, title: str,publication_year: int, director: str, rating: float |None, user_id: int, poster: str |None):
+    def create_movie(
+        self,
+        title: str,
+        publication_year: int,
+        director: str,
+        rating: float | None,
+        user_id: int,
+        poster: str | None,
+    ):
         """
         creates and persists a movie
         """
@@ -65,12 +72,12 @@ class DataManager():
             raise TypeError("publictaion year must be an integer.")
 
         movie = Movie(
-                title=title,
-                publication_year=publication_year,
-                director=director,
-                rating=rating,
-                user_id=user_id,
-                poster=poster
+            title=title,
+            publication_year=publication_year,
+            director=director,
+            rating=rating,
+            user_id=user_id,
+            poster=poster,
         )
         try:
             db.session.add(movie)
@@ -81,8 +88,6 @@ class DataManager():
             db.session.rollback()
             raise e
 
-
-
     def get_user_movies(self, user_id: int) -> list[Movie]:
         """Returns a list of movies for the given user_id."""
         try:
@@ -92,7 +97,6 @@ class DataManager():
             db.session.rollback()
             return []
 
-
     def get_movie(self, movie_id):
         try:
             return Movie.query.get(movie_id)
@@ -100,8 +104,12 @@ class DataManager():
             print(f"Error while fetching movie: {e}")
             return None
 
-
-    def update_movie(self, movie_id: int, new_title: str | None = None, new_rating: float | None = None):
+    def update_movie(
+        self,
+        movie_id: int,
+        new_title: str | None = None,
+        new_rating: float | None = None,
+    ):
         """
         Updates the movie's title and/or rating.
         Rating must be between 1 and 10 if provided.
@@ -110,7 +118,8 @@ class DataManager():
         if not movie:
             return None  # Movie existiert nicht
 
-        if new_title:movie.title = new_title
+        if new_title:
+            movie.title = new_title
 
         if new_rating is not None:
             if not (1 <= new_rating <= 10):
@@ -124,7 +133,6 @@ class DataManager():
             db.session.rollback()
             print(f"Error updating movie: {e}")
             return None
-
 
     def delete_movie(self, movie_id: int):
         """
@@ -140,4 +148,3 @@ class DataManager():
         except Exception:
             db.session.rollback()
             return False
-
