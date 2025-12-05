@@ -1,4 +1,4 @@
-from flask import Flask, redirect, request, url_for, render_template
+from flask import Flask, redirect, request, url_for, render_template, flash
 import os
 from dotenv import load_dotenv
 from data_manager import DataManager
@@ -11,6 +11,8 @@ OMDB_BASE_URL = "http://www.omdbapi.com/"
 
 #  Flask App
 app = Flask(__name__)
+app.secret_key = os.getenv("FLASK_SECRET_KEY", "dein_geheimer_schlüssel")
+
 
 #  Basisverzeichnis + DB
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -26,7 +28,6 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db.init_app(app)
 data_manager = DataManager()
 
-# Tabellen erstellen wieso so ?
 with app.app_context():
     db.create_all()
 
@@ -42,25 +43,18 @@ def Error(error):
 
 
 # home zeigt alle User + Button zum hinzufügen
-
-
 @app.route("/", methods=["GET", "POST"])
 def home():
-    print(data_manager.get_all_users())  # Debug: sollte eine Liste ausgeben
     if request.method == "POST":
         name = request.form.get("name")
-        if name:
-            user = User(name=name)
-            db.session.add(user)
-            db.session.commit()
-        return redirect(url_for("home"))  #
-
-    users = User.query.all()
+        data_manager.create_user(name)
+    users =  data_manager.get_all_users()
     return render_template("index.html", users=users)
 
 
 @app.route("/users/<int:user_id>/movies", methods=["GET", "POST"])
 def user_movies(user_id):
+    #POST
     if request.method == "POST":
         title = request.form.get("title")
         year_input = request.form.get("year")
@@ -77,20 +71,16 @@ def user_movies(user_id):
         data = response.json()
 
         if data.get("Response") == "False":
-            return f"Movie not found: {data.get('Error')}", 404
+             flash(f"Error while fetching: {data.get('Error')}. Or search parameters were incorrect"), 404
+             return redirect(url_for("user_movies", user_id=user_id))
 
-        year = (
-            int(data.get("Year"))
-            if data.get("Year") and data.get("Year").isdigit()
-            else None
-        )
+        year = data.get("Year")
         director = data.get("Director", "")
         rating = (
             float(data.get("imdbRating"))
-            if data.get("imdbRating") and data.get("imdbRating") != "N/A"
+            if data.get("imdbRating") != "N/A"
             else None
         )
-
         poster = data.get("Poster")
         if poster in [None, "N/A"]:
             poster = None
@@ -103,14 +93,15 @@ def user_movies(user_id):
             user_id=user_id,
             poster=poster,
         )
-
         return redirect(url_for("user_movies", user_id=user_id))
 
-    # GET: Liste der Filme anzeigen
+    # GET
     user = data_manager.get_user(user_id)
     if not user:
         return "User not found", 404
     movies = data_manager.get_user_movies(user_id)
+    for i in movies:
+        print(i.rating)
     return render_template("movies.html", movies=movies, user=user)
 
 
@@ -128,7 +119,7 @@ def update_movie(user_id, movie_id):
             movie_id=movie_id, new_title=title, new_rating=new_rating
         )
     except ValueError as ve:
-        return str(ve), 400  # z.B. "Rating must be between 1 and 10"
+        return str(ve), 400
     except Exception as e:
         return f"Error updating movie: {e}", 500
 

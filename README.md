@@ -9,7 +9,7 @@ A simple web application to manage movies. Users can add, view, and update movie
 - Optional title field when updating
 - External movie info from OMDb API
 
-## Installation
+### Installation
 1. Clone the repository:
    ```bash
    git clone <REPO_URL>
@@ -26,14 +26,14 @@ A simple web application to manage movies. Users can add, view, and update movie
 4. Set OMDb API key in .env file
     OMDB_API_KEY=your_api_key
 
-### Uusage
+#### Uusage
 1. start Flask
     flask run
 
 2. open browser
      http://127.0.0.1:5000
 
-3. Search, add, view, and update movies.
+3. Add New User -> Search, view, and update movies.
 
 
 ####Structure

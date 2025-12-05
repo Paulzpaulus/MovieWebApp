@@ -37,6 +37,7 @@ class DataManager:
             db.session.rollback()
             return []
 
+    # for later implementation - not implemented as route or in html yet
     # def delete_user(self, user_id: int):
     #     """
     #     deletes a user from db
@@ -53,11 +54,10 @@ class DataManager:
     #         return False
 
     # Movies
-
     def create_movie(
         self,
         title: str,
-        publication_year: int,
+        publication_year: str | None,
         director: str,
         rating: float | None,
         user_id: int,
@@ -68,9 +68,9 @@ class DataManager:
         """
         if not title and not publication_year:
             raise ValueError("title or publication year must not be empty.")
-        if not isinstance(publication_year, int):
+        if not isinstance(publication_year, (str, None)):
             raise TypeError("publictaion year must be an integer.")
-
+        print(rating)
         movie = Movie(
             title=title,
             publication_year=publication_year,

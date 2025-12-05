@@ -9,14 +9,15 @@
 
 <ul class="user-list">
     {% for user in users %}
-    <li>
-        {{ user.name }}
+    <li class="user-card">
+        <span class="user-name">{{ user.name }}</span>
         <a href="{{ url_for('user_movies', user_id=user.id) }}">View Movies</a>
     </li>
     {% else %}
-    <li>No users found</li>
+    <li class="user-card">No users found</li>
     {% endfor %}
 </ul>
+
 
 <h2>Add new user</h2>
 <form action="{{ url_for('home') }}" method="POST">
